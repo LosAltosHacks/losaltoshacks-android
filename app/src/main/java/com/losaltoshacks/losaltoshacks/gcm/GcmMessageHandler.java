@@ -13,5 +13,9 @@ public class GcmMessageHandler extends GcmListenerService {
         String message = data.getString("message");
         Log.d(LOG_TAG, "From: " + from);
         Log.d(LOG_TAG, "Message: " + message);
+
+        if (from.startsWith("/topics/")) {
+            Log.d(LOG_TAG, "topic");
+        }
     }
 }
