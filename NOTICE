@@ -1,0 +1,17 @@
+Los Altos Hacks Android
+Copyright (c) 2016, Los Altos Hacks Team
+
+This app is licensed under the ISC license. A copy can be found in the LICENSE
+file, or at http://opensource.org/licenses/ISC.
+
+This app includes code from the following sources:
+
+Transferring Data Using Sync Adapters
+(https://developer.android.com/training/sync-adapters/)
+Copyright (c) 2016, The Android Open Source Project
+Licensed under the Apache License 2.0
+
+Google APIs for Mobile: Quickstarts
+(https://github.com/googlesamples/google-services/tree/master/android/gcm/app/src/main/java/gcm/play/android/samples/com/gcmquickstart)
+Copyright 2015 Google Inc. All Rights Reserved.
+Licensed under the Apache License 2.0

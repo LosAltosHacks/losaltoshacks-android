@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2016, Los Altos Hacks Team
+ *
+ * This project is licensed under the ISC license. See the LICENSE file or
+ * http://opensource.org/licenses/ISC for a copy.
+ */
+
 package com.losaltoshacks.losaltoshacks;
 
 import android.os.Bundle;
