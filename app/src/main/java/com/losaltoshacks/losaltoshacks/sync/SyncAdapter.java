@@ -76,6 +76,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+        Log.d(LOG_TAG, "onPerformSync");
         Context context = getContext();
         String syncType = extras.getString(SYNC_TYPE_KEY, "");
         URL updates = null;
@@ -130,6 +131,15 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static void syncImmediately(Context context) {
+        Bundle bundle = new Bundle();
+        bundle.putString(SyncAdapter.SYNC_TYPE_KEY, SyncAdapter.SYNC_UPDATES);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        ContentResolver.requestSync(SyncAdapter.getSyncAccount(context),
+                context.getString(R.string.content_authority), bundle);
     }
 
     public static Account getSyncAccount(Context context) {
