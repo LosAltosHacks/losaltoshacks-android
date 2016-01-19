@@ -8,7 +8,7 @@
  * Copyright (c) 2015 Suleiman Ali Shakir
  */
 
-package com.losaltoshacks.losaltoshacks;
+package com.losaltoshacks.android;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.Fragment;

@@ -1,4 +1,4 @@
-package com.losaltoshacks.losaltoshacks;
+package com.losaltoshacks.android;
 
 import org.junit.Test;
 

@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package com.losaltoshacks.losaltoshacks.gcm;
+package com.losaltoshacks.android.gcm;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -31,7 +31,7 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
-import com.losaltoshacks.losaltoshacks.R;
+import com.losaltoshacks.android.R;
 
 import java.io.IOException;
 

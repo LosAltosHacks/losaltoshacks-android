@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/ISC for a copy.
  */
 
-package com.losaltoshacks.losaltoshacks;
+package com.losaltoshacks.android;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

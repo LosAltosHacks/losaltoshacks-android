@@ -1,17 +1,17 @@
 {
   "project_info": {
-    "project_id": "los-altos-hacks-7a113",
-    "project_number": "733009410601",
+    "project_id": "los-altos-hacks-270be",
+    "project_number": "4547754716",
     "name": "Los Altos Hacks"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:733009410601:android:f80c12a5dee0b81e",
-        "client_id": "android:com.losaltoshacks.losaltoshacks",
+        "mobilesdk_app_id": "1:4547754716:android:ecab0cb299790580",
+        "client_id": "android:com.losaltoshacks.android",
         "client_type": 1,
         "android_client_info": {
-          "package_name": "com.losaltoshacks.losaltoshacks"
+          "package_name": "com.losaltoshacks.android"
         }
       },
       "oauth_client": [],

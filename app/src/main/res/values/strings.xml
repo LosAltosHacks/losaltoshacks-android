@@ -6,7 +6,7 @@
 
     <string name="sync_account_type">losaltoshacks.com</string>
 
-    <string name="content_authority">com.losaltoshacks.losaltoshacks</string>
+    <string name="content_authority">com.losaltoshacks.android</string>
 
     <string name="pref_registration_token">registration_token</string>
     <string name="pref_registration_error">registration_error</string>

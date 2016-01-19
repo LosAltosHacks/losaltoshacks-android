@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.losaltoshacks.losaltoshacks" >
+    package="com.losaltoshacks.android" >
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
@@ -9,9 +9,9 @@
 
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
-    <permission android:name="com.losaltoshacks.losaltoshacks.permission.C2D_MESSAGE"
+    <permission android:name="com.losaltoshacks.android.permission.C2D_MESSAGE"
         android:protectionLevel="signature"/>
-    <uses-permission android:name="com.losaltoshacks.losaltoshacks.permission.C2D_MESSAGE"/>
+    <uses-permission android:name="com.losaltoshacks.android.permission.C2D_MESSAGE"/>
 
     <application
         android:allowBackup="true"
@@ -66,21 +66,21 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="com.losaltoshacks.losaltoshacks.gcm.GcmMessageHandler"
+        <service android:name="com.losaltoshacks.android.gcm.GcmMessageHandler"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
             </intent-filter>
         </service>
 
-        <service android:name="com.losaltoshacks.losaltoshacks.gcm.InstanceIDListenerService"
+        <service android:name="com.losaltoshacks.android.gcm.InstanceIDListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID"/>
             </intent-filter>
         </service>
 
-        <service android:name=".gcm.RegistrationIntentService"
+        <service android:name="com.losaltoshacks.android.gcm.RegistrationIntentService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE"/>

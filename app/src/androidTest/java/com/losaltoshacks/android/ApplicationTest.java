@@ -1,4 +1,4 @@
-package com.losaltoshacks.losaltoshacks;
+package com.losaltoshacks.android;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

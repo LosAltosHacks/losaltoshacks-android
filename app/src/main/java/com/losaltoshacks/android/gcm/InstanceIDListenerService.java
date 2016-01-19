@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package com.losaltoshacks.losaltoshacks.gcm;
+package com.losaltoshacks.android.gcm;
 
 import android.content.Intent;
 

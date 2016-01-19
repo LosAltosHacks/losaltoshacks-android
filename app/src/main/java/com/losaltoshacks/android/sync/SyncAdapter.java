@@ -22,7 +22,7 @@
  * limitations under the License.
  */
 
-package com.losaltoshacks.losaltoshacks.sync;
+package com.losaltoshacks.android.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -34,7 +34,7 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.losaltoshacks.losaltoshacks.R;
+import com.losaltoshacks.android.R;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

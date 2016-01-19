@@ -21,7 +21,7 @@
  * limitations under the License.
  */
 
-package com.losaltoshacks.losaltoshacks.sync;
+package com.losaltoshacks.android.sync;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;

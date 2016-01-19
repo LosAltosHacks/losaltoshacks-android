@@ -8,7 +8,7 @@
  * Copyright (c) 2015 Suleiman Ali Shakir
  */
 
-package com.losaltoshacks.losaltoshacks;
+package com.losaltoshacks.android;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -25,7 +25,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.losaltoshacks.losaltoshacks.gcm.RegistrationIntentService;
+import com.losaltoshacks.android.gcm.RegistrationIntentService;
 
 public class MainActivity extends AppCompatActivity {
 
