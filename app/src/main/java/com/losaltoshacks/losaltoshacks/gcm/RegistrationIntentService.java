@@ -38,10 +38,6 @@ import java.io.IOException;
 public class RegistrationIntentService extends IntentService {
     private static final String LOG_TAG = RegistrationIntentService.class.getSimpleName();
 
-    private static final String[] TOPICS = {
-            "schedule_update"
-    };
-
     public RegistrationIntentService() {
         super(LOG_TAG);
     }
@@ -74,7 +70,8 @@ public class RegistrationIntentService extends IntentService {
         }
 
         GcmPubSub pubSub = GcmPubSub.getInstance(this);
-        for (String topic : TOPICS) {
+        String[] topics = getResources().getStringArray(R.array.subscription_topics);
+        for (String topic : topics) {
             pubSub.subscribe(token, "/topics/" + topic, null);
             Log.d(LOG_TAG, "Subscribed to /topics/" + topic);
         }
@@ -90,7 +87,8 @@ public class RegistrationIntentService extends IntentService {
         }
 
         GcmPubSub pubSub = GcmPubSub.getInstance(this);
-        for (String topic : TOPICS) {
+        String[] topics = getResources().getStringArray(R.array.subscription_topics);
+        for (String topic : topics) {
             pubSub.unsubscribe(token, "/topics/" + topic);
         }
     }

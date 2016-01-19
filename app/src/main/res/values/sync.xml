@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="sync_updates_url">Updates URL:</string>
+    <string name="sync_updates_url">https://raw.githubusercontent.com/losaltoshacks/losaltoshacks-api/master/updates.json</string>
     <string name="updates_filename">updates</string>
+
+    <string-array name="subscription_topics">
+        <item>updates</item>
+    </string-array>
 </resources>
