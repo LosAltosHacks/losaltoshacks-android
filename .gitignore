@@ -8,3 +8,6 @@
 
 # GCM data
 app/src/main/res/values/gcm.xml
+
+# Sync data
+app/src/main/res/values/sync.xml
