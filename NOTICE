@@ -6,6 +6,11 @@ file, or at http://opensource.org/licenses/ISC.
 
 This app includes code from the following sources:
 
+Android Material Design for pre-Lollipop
+(https://github.com/Suleiman19/Android-Material-Design-for-pre-Lollipop)
+Copyright (c) 2015 Suleiman Ali Shakir
+Licensed under the MIT License
+
 Transferring Data Using Sync Adapters
 (https://developer.android.com/training/sync-adapters/)
 Copyright (c) 2016, The Android Open Source Project

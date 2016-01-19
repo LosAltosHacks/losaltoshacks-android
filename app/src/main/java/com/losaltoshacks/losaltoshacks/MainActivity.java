@@ -1,8 +1,11 @@
 /*
  * Copyright (C) 2016, Los Altos Hacks Team
  *
- * This project is licensed under the ISC license. See the LICENSE file or
- * http://opensource.org/licenses/ISC for a copy.
+ * The following code is a derivative work of code from Suleiman Ali Shakir,
+ * which is licensed under the MIT License. This project is licensed under the
+ * ISC license. See the LICENSE file or http://opensource.org/licenses/ISC.
+ *
+ * Copyright (c) 2015 Suleiman Ali Shakir
  */
 
 package com.losaltoshacks.losaltoshacks;
@@ -11,8 +14,8 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -33,7 +36,20 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
+        setupViewPager(viewPager);
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout.setupWithViewPager(viewPager);
+
         checkIfPlayServicesAvailable();
+    }
+
+    private void setupViewPager(ViewPager viewPager) {
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        viewPagerAdapter.addFragment(new DashboardFragment(), "Dashboard");
+        viewPagerAdapter.addFragment(new ScheduleFragment(), "Schedule");
+        viewPager.setAdapter(viewPagerAdapter);
     }
 
     @Override
