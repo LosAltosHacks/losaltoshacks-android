@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sync_updates_url">Updates URL:</string>
+    <string name="updates_filename">updates</string>
+</resources>

@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                 });
                 errorDialog.show();
             } else {
-                Toast.makeText(this, "Your device does not have Google Play Services and is not supported",
+                Toast.makeText(this, "Your device does not have Google Play Services and is not supported.",
                         Toast.LENGTH_LONG).show();
                 finish();
             }
