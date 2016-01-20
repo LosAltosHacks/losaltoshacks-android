@@ -28,7 +28,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 
-public class ScheduleProvider extends ContentProvider {
+public class DummyProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {

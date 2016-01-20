@@ -32,7 +32,7 @@
 
         <provider
             android:authorities="@string/content_authority"
-            android:name=".data.ScheduleProvider"
+            android:name=".data.DummyProvider"
             android:exported="false"
             android:syncable="true"/>
 
