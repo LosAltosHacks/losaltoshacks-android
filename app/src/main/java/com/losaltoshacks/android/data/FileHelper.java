@@ -39,10 +39,12 @@ public class FileHelper extends Observable {
     }
 
     public JSONArray readUpdates(Context context) {
+        Log.d(LOG_TAG, "Reading updates");
         return readJSONFile(updatesLock, context.getString(R.string.updates_filename), context);
     }
 
     public void writeUpdates(JSONArray updates, Context context) {
+        Log.d(LOG_TAG, "Writing updates");
         Utility.sortJSONArray(
                 updates, new Comparator<JSONObject>() {
                     @Override

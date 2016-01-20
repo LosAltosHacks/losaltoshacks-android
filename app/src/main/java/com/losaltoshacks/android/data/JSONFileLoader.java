@@ -9,8 +9,9 @@
  */
 package com.losaltoshacks.android.data;
 
-import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.support.v4.content.AsyncTaskLoader;
+import android.util.Log;
 
 import org.json.JSONArray;
 
@@ -18,6 +19,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class JSONFileLoader extends AsyncTaskLoader<JSONArray[]> {
+    private static final String LOG_TAG = JSONFileLoader.class.getSimpleName();
     private JSONArray[] mData;
     private FileObserver mObserver;
 
@@ -51,6 +53,7 @@ public class JSONFileLoader extends AsyncTaskLoader<JSONArray[]> {
             mObserver = new FileObserver();
         }
         if (takeContentChanged() || mData == null) {
+            Log.d(LOG_TAG, "Reloading data");
             forceLoad();
         }
     }

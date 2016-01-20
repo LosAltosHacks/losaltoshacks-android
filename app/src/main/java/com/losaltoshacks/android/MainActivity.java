@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.losaltoshacks.android.onesignal.NotificationHandler;
+import com.losaltoshacks.android.sync.SyncAdapter;
 import com.onesignal.OneSignal;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         viewPagerAdapter.addFragment(new DashboardFragment(), "Dashboard");
         viewPagerAdapter.addFragment(new ScheduleFragment(), "Schedule");
+        viewPagerAdapter.addFragment(new UpdatesFragment(), "Updates");
         viewPager.setAdapter(viewPagerAdapter);
     }
 
@@ -77,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Log.d(LOG_TAG, "Pushed settings");
+            SyncAdapter.syncImmediately(this);
             return true;
         }
 
