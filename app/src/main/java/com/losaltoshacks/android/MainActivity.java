@@ -28,6 +28,7 @@ import com.losaltoshacks.android.onesignal.NotificationHandler;
 import com.onesignal.OneSignal;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Log.d("MainActivity", "Pushed settings");
+            Log.d(LOG_TAG, "Pushed settings");
             return true;
         }
 

@@ -35,14 +35,14 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.losaltoshacks.android.R;
+import com.losaltoshacks.android.data.FileHelper;
+import com.losaltoshacks.android.data.Utility;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -79,56 +79,37 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Log.d(LOG_TAG, "onPerformSync");
         Context context = getContext();
         String syncType = extras.getString(SYNC_TYPE_KEY, "");
-        URL updates = null;
+        URL syncUrl = null;
         HttpURLConnection httpURLConnection = null;
-        BufferedReader bufferedReader = null;
-        BufferedWriter bufferedWriter = null;
 
         try {
-            String syncFilename;
             if (syncType.equals(SYNC_UPDATES)) {
-                updates = new URL(getContext().getString(R.string.sync_updates_url));
-                syncFilename = context.getString(R.string.updates_filename);
+                syncUrl = new URL(getContext().getString(R.string.sync_updates_url));
             } else {
                 Log.e(LOG_TAG, "Invalid sync type: " + syncType);
                 return;
             }
 
-            httpURLConnection = (HttpURLConnection) updates.openConnection();
+            httpURLConnection = (HttpURLConnection) syncUrl.openConnection();
             httpURLConnection.setRequestMethod("GET");
             httpURLConnection.connect();
 
             InputStream in = httpURLConnection.getInputStream();
-            bufferedReader = new BufferedReader(new InputStreamReader(in));
 
-            FileOutputStream fileOutputStream =
-                    context.openFileOutput(syncFilename, Context.MODE_PRIVATE);
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream));
+            FileHelper fileHelper = new FileHelper(context);
 
-            String line = bufferedReader.readLine();
-            while (line != null) {
-                bufferedWriter.append(line + "\n");
-                line = bufferedReader.readLine();
-            }
+            fileHelper.writeUpdates(new JSONArray(Utility.readInputStream(in)));
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, "Malformed syncing url.");
+            e.printStackTrace();
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "Invalid JSON data from URL: " + syncUrl.toString());
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             if (httpURLConnection != null) {
                 httpURLConnection.disconnect();
-            }
-            try {
-                if (bufferedReader != null) {
-                    bufferedReader.close();
-                }
-                if (bufferedWriter != null) {
-                    bufferedWriter.close();
-                }
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Failed to close buffered reader or writer.");
-                e.printStackTrace();
             }
         }
     }
