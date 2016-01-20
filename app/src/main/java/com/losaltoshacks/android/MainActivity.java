@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.losaltoshacks.android.onesignal.NotificationHandler;
 import com.onesignal.OneSignal;
 
 public class MainActivity extends AppCompatActivity {

@@ -55,5 +55,12 @@
             <meta-data android:name="android.content.SyncAdapter"
                 android:resource="@xml/syncadapter"/>
         </service>
+
+        <receiver android:name=".onesignal.Receiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.onesignal.BackgroundBroadcast.RECEIVE"/>
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
