@@ -5,6 +5,3 @@
 .DS_Store
 /build
 /captures
-
-# GCM data
-app/src/main/res/values/gcm.xml

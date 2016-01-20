@@ -12,7 +12,6 @@ package com.losaltoshacks.android;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -25,7 +24,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.losaltoshacks.android.gcm.RegistrationIntentService;
+import com.onesignal.OneSignal;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
 
         checkIfPlayServicesAvailable();
+        OneSignal.startInit(this).setNotificationOpenedHandler(new NotificationHandler()).init();
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -75,8 +75,6 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Log.d("MainActivity", "Pushed settings");
-            Intent intent = new Intent(this, RegistrationIntentService.class);
-            startService(intent);
             return true;
         }
 
