@@ -6,6 +6,10 @@ file, or at http://opensource.org/licenses/ISC.
 
 This app includes code from the following sources:
 
+AppListLoader (https://github.com/alexjlockwood/AppListLoader)
+Copyright (c) 2012 Alex Lockwood
+Licensed under the MIT License
+
 Android Material Design for pre-Lollipop
 (https://github.com/Suleiman19/Android-Material-Design-for-pre-Lollipop)
 Copyright (c) 2015 Suleiman Ali Shakir

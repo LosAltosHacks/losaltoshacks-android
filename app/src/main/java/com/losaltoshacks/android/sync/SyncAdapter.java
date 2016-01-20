@@ -96,9 +96,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
             InputStream in = httpURLConnection.getInputStream();
 
-            FileHelper fileHelper = new FileHelper(context);
-
-            fileHelper.writeUpdates(new JSONArray(Utility.readInputStream(in)));
+            FileHelper.getInstance().writeUpdates(new JSONArray(Utility.readInputStream(in)), context);
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, "Malformed syncing url.");
             e.printStackTrace();
@@ -134,6 +132,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             if (!accountManager.addAccountExplicitly(newAccount, null, null)) {
                 return null;
             }
+            syncImmediately(context);
         }
         return newAccount;
     }

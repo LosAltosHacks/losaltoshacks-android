@@ -14,32 +14,58 @@ import com.losaltoshacks.android.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Comparator;
+import java.util.Observable;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class FileHelper {
+public class FileHelper extends Observable {
     private static final String LOG_TAG = FileHelper.class.getSimpleName();
-    private Context context;
+
+    private static FileHelper instance = new FileHelper();
     private static ReentrantLock updatesLock = new ReentrantLock();
 
-    public FileHelper(Context context) {
-        this.context = context;
+    private FileHelper() {
     }
 
-    public JSONArray readUpdates() {
-        return readJSONFile(updatesLock, context.getString(R.string.updates_filename));
+    public static FileHelper getInstance() {
+        return instance;
     }
 
-    public void writeUpdates(JSONArray updates) {
-        writeJSONFile(updates, updatesLock, context.getString(R.string.updates_filename));
+    public JSONArray readUpdates(Context context) {
+        return readJSONFile(updatesLock, context.getString(R.string.updates_filename), context);
     }
 
-    private JSONArray readJSONFile(ReentrantLock lock, String filename) {
+    public void writeUpdates(JSONArray updates, Context context) {
+        Utility.sortJSONArray(
+                updates, new Comparator<JSONObject>() {
+                    @Override
+                    public int compare(JSONObject lhs, JSONObject rhs) {
+                        try {
+                            int lDate = lhs.getInt("date"),
+                                    rDate = rhs.getInt("date");
+
+                            if (lDate == rDate) {
+                                return 0;
+                            }
+                            return lDate < rDate ? -1 : 1;
+                        } catch (JSONException e) {
+                            Log.e(LOG_TAG, "Failed to sort updates JSONArray");
+                            e.printStackTrace();
+                            return 0;
+                        }
+                    }
+                });
+        writeJSONFile(updates, updatesLock, context.getString(R.string.updates_filename), context);
+    }
+
+    private JSONArray readJSONFile(ReentrantLock lock, String filename, Context context) {
         lock.lock();
 
         JSONArray fileData = null;
@@ -58,7 +84,7 @@ public class FileHelper {
         return fileData;
     }
 
-    private void writeJSONFile(JSONArray jsonData, ReentrantLock lock, String filename) {
+    private void writeJSONFile(JSONArray jsonData, ReentrantLock lock, String filename, Context context) {
         lock.lock();
 
         BufferedWriter bufferedWriter = null;
@@ -68,6 +94,7 @@ public class FileHelper {
 
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream));
             bufferedWriter.write(jsonData.toString());
+            notifyObservers();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
