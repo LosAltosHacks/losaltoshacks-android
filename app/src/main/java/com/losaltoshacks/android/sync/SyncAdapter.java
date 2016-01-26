@@ -29,17 +29,20 @@ import android.accounts.AccountManager;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.losaltoshacks.android.R;
-import com.losaltoshacks.android.data.FileHelper;
+import com.losaltoshacks.android.data.Contract.ScheduleEntry;
+import com.losaltoshacks.android.data.Contract.UpdatesEntry;
 import com.losaltoshacks.android.data.Utility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,9 +58,6 @@ import java.net.URL;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private static final String LOG_TAG = SyncAdapter.class.getSimpleName();
-
-    public static final String SYNC_TYPE_KEY = "sync_type";
-    public static final String SYNC_UPDATES = "sync_updates";
 
     ContentResolver mContentResolver;
 
@@ -78,30 +78,31 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(LOG_TAG, "onPerformSync");
         Context context = getContext();
-        String syncType = extras.getString(SYNC_TYPE_KEY, "");
-        URL syncUrl = null;
+
+        insertJSONData(
+                downloadJSONFromURL(context.getString(R.string.sync_updates_url)),
+                downloadJSONFromURL(context.getString(R.string.sync_schedule_url)),
+                context);
+    }
+
+    private JSONArray downloadJSONFromURL(String urlString) {
         HttpURLConnection httpURLConnection = null;
+        URL url = null;
 
         try {
-            if (syncType.equals(SYNC_UPDATES)) {
-                syncUrl = new URL(getContext().getString(R.string.sync_updates_url));
-            } else {
-                Log.e(LOG_TAG, "Invalid sync type: " + syncType);
-                return;
-            }
-
-            httpURLConnection = (HttpURLConnection) syncUrl.openConnection();
+            url = new URL(urlString);
+            httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setRequestMethod("GET");
             httpURLConnection.connect();
 
             InputStream in = httpURLConnection.getInputStream();
 
-            FileHelper.getInstance().writeUpdates(new JSONArray(Utility.readInputStream(in)), context);
+            return new JSONArray(Utility.readInputStream(in));
         } catch (MalformedURLException e) {
-            Log.e(LOG_TAG, "Malformed syncing url.");
+            Log.e(LOG_TAG, "Malformed url: " + urlString);
             e.printStackTrace();
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Invalid JSON data from URL: " + syncUrl.toString());
+            Log.e(LOG_TAG, "Invalid JSON data from URL: " + url.toString());
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
@@ -110,11 +111,66 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 httpURLConnection.disconnect();
             }
         }
+        return null;
+    }
+
+    private static void insertJSONData(JSONArray updatesJSON, JSONArray scheduleJSON, Context context) {
+        final String UPDATES_TITLE = "title";
+        final String UPDATES_DESCRIPTION = "description";
+        final String UPDATES_DATE = "date";
+        final String UPDATES_TAG = "tag";
+
+        final String SCHEDULE_EVENT = "event";
+        final String SCHEDULE_TIME = "time";
+        final String SCHEDULE_LOCATION = "location";
+        final String SCHEDULE_TAG = "tag";
+
+        ContentResolver contentResolver = context.getContentResolver();
+
+        try {
+            ContentValues[] updatesArray = new ContentValues[updatesJSON.length()];
+            for (int i = 0; i < updatesJSON.length(); i++) {
+                JSONObject update = updatesJSON.getJSONObject(i);
+
+                ContentValues updateValues = new ContentValues();
+
+                updateValues.put(UpdatesEntry.COLUMN_TITLE, update.getString(UPDATES_TITLE));
+                updateValues.put(UpdatesEntry.COLUMN_DESCRIPTION, update.getString(UPDATES_DESCRIPTION));
+                updateValues.put(UpdatesEntry.COLUMN_DATE, update.getString(UPDATES_DATE));
+                updateValues.put(UpdatesEntry.COLUMN_TAG, update.getString(UPDATES_TAG));
+
+                updatesArray[i] = updateValues;
+            }
+
+            contentResolver.delete(UpdatesEntry.CONTENT_URI, null, null);
+            contentResolver.bulkInsert(UpdatesEntry.CONTENT_URI, updatesArray);
+
+            ContentValues[] scheduleArray = new ContentValues[scheduleJSON.length()];
+            for (int i = 0; i < scheduleJSON.length(); i++) {
+                JSONObject event = scheduleJSON.getJSONObject(i);
+
+                ContentValues scheduleValues = new ContentValues();
+
+                scheduleValues.put(ScheduleEntry.COLUMN_EVENT, event.getString(SCHEDULE_EVENT));
+                scheduleValues.put(ScheduleEntry.COLUMN_TIME, event.getString(SCHEDULE_TIME));
+                scheduleValues.put(ScheduleEntry.COLUMN_LOCATION, event.getString(SCHEDULE_LOCATION));
+                scheduleValues.put(ScheduleEntry.COLUMN_TAG, event.getString(SCHEDULE_TAG));
+
+                scheduleArray[i] = scheduleValues;
+            }
+
+            contentResolver.delete(ScheduleEntry.CONTENT_URI, null, null);
+            contentResolver.bulkInsert(ScheduleEntry.CONTENT_URI, scheduleArray);
+
+            Log.d(LOG_TAG, "Synced " + (updatesArray.length + scheduleArray.length) + " items.");
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "Error while inserting JSON data.");
+            e.printStackTrace();
+        }
     }
 
     public static void syncImmediately(Context context) {
         Bundle bundle = new Bundle();
-        bundle.putString(SyncAdapter.SYNC_TYPE_KEY, SyncAdapter.SYNC_UPDATES);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         ContentResolver.requestSync(SyncAdapter.getSyncAccount(context),

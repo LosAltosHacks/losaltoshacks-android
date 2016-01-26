@@ -42,7 +42,7 @@ public class Provider extends ContentProvider {
 
     private static final String sScheduleWithStartDateSelection =
             Contract.ScheduleEntry.TABLE_NAME +
-                    "." + Contract.ScheduleEntry.COLUMN_START + " >= ? ";
+                    "." + Contract.ScheduleEntry.COLUMN_TIME + " >= ? ";
 
     static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);

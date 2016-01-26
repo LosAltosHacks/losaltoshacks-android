@@ -52,10 +52,8 @@ public class DbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_SCHEDULE_TABLE = "CREATE TABLE " + ScheduleEntry.TABLE_NAME + " (" +
                 ScheduleEntry._ID + " INTEGER PRIMARY KEY," +
-                ScheduleEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
-                ScheduleEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
-                ScheduleEntry.COLUMN_START + " INTEGER NOT NULL, " +
-                ScheduleEntry.COLUMN_END + " INTEGER NOT NULL," +
+                ScheduleEntry.COLUMN_EVENT + " TEXT NOT NULL, " +
+                ScheduleEntry.COLUMN_TIME + " INTEGER NOT NULL, " +
                 ScheduleEntry.COLUMN_LOCATION + " TEXT NOT NULL, " +
                 ScheduleEntry.COLUMN_TAG + " TEXT NOT NULL, " +
                 " );";

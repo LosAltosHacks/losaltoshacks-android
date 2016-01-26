@@ -25,7 +25,6 @@ public class Receiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.d(LOG_TAG, "onReceive");
         Bundle bundle = new Bundle();
-        bundle.putString(SyncAdapter.SYNC_TYPE_KEY, SyncAdapter.SYNC_UPDATES);
         ContentResolver.requestSync(SyncAdapter.getSyncAccount(context),
                 context.getString(R.string.content_authority), bundle);
     }

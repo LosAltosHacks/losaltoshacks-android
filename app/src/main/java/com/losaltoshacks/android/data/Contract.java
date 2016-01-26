@@ -71,10 +71,8 @@ public class Contract {
 
         public static final String TABLE_NAME = "schedule";
 
-        public static final String COLUMN_TITLE = "title";
-        public static final String COLUMN_DESCRIPTION = "description";
-        public static final String COLUMN_START = "start";
-        public static final String COLUMN_END = "end";
+        public static final String COLUMN_EVENT = "event";
+        public static final String COLUMN_TIME = "time";
         public static final String COLUMN_LOCATION = "location";
         public static final String COLUMN_TAG = "tag";
 

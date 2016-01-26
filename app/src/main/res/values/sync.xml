@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="sync_updates_url">https://raw.githubusercontent.com/losaltoshacks/losaltoshacks-api/master/updates.json</string>
+    <string name="sync_updates_url">https://s3-us-west-2.amazonaws.com/losaltoshacks/updates.json</string>
+    <string name="sync_schedule_url">https://s3-us-west-2.amazonaws.com/losaltoshacks/schedule.json</string>
     <string name="updates_filename">updates</string>
 
     <string-array name="subscription_topics">
