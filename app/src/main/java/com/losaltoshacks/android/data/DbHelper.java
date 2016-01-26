@@ -55,7 +55,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 ScheduleEntry.COLUMN_EVENT + " TEXT NOT NULL, " +
                 ScheduleEntry.COLUMN_TIME + " INTEGER NOT NULL, " +
                 ScheduleEntry.COLUMN_LOCATION + " TEXT NOT NULL, " +
-                ScheduleEntry.COLUMN_TAG + " TEXT NOT NULL, " +
+                ScheduleEntry.COLUMN_TAG + " TEXT NOT NULL " +
                 " );";
 
         sqLiteDatabase.execSQL(SQL_CREATE_UPDATES_TABLE);
