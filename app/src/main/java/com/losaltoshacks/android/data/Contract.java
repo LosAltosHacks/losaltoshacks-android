@@ -51,7 +51,7 @@ public class Contract {
 
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_DESCRIPTION = "description";
-        public static final String COLUMN_DATE = "date";
+        public static final String COLUMN_TIME = "time";
         public static final String COLUMN_TAG = "tag";
 
         public static Uri buildUpdatesUri(long id) {
@@ -80,7 +80,7 @@ public class Contract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static long getDateFromUri(Uri uri) {
+        public static long getTimeFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(0));
         }
     }

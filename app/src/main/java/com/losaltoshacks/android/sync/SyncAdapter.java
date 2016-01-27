@@ -117,7 +117,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private static void insertJSONData(JSONArray updatesJSON, JSONArray scheduleJSON, Context context) {
         final String UPDATES_TITLE = "title";
         final String UPDATES_DESCRIPTION = "description";
-        final String UPDATES_DATE = "date";
+        final String UPDATES_TIME = "date";
         final String UPDATES_TAG = "tag";
 
         final String SCHEDULE_EVENT = "event";
@@ -136,14 +136,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
                 updateValues.put(UpdatesEntry.COLUMN_TITLE, update.getString(UPDATES_TITLE));
                 updateValues.put(UpdatesEntry.COLUMN_DESCRIPTION, update.getString(UPDATES_DESCRIPTION));
-                updateValues.put(UpdatesEntry.COLUMN_DATE, update.getString(UPDATES_DATE));
+                updateValues.put(UpdatesEntry.COLUMN_TIME, update.getInt(UPDATES_TIME));
                 updateValues.put(UpdatesEntry.COLUMN_TAG, update.getString(UPDATES_TAG));
 
                 updatesArray[i] = updateValues;
             }
 
             contentResolver.delete(UpdatesEntry.CONTENT_URI, null, null);
-            contentResolver.bulkInsert(UpdatesEntry.CONTENT_URI, updatesArray);
+            int updatesInserted = contentResolver.bulkInsert(UpdatesEntry.CONTENT_URI, updatesArray);
 
             ContentValues[] scheduleArray = new ContentValues[scheduleJSON.length()];
             for (int i = 0; i < scheduleJSON.length(); i++) {
@@ -152,7 +152,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 ContentValues scheduleValues = new ContentValues();
 
                 scheduleValues.put(ScheduleEntry.COLUMN_EVENT, event.getString(SCHEDULE_EVENT));
-                scheduleValues.put(ScheduleEntry.COLUMN_TIME, event.getString(SCHEDULE_TIME));
+                scheduleValues.put(ScheduleEntry.COLUMN_TIME, event.getInt(SCHEDULE_TIME));
                 scheduleValues.put(ScheduleEntry.COLUMN_LOCATION, event.getString(SCHEDULE_LOCATION));
                 scheduleValues.put(ScheduleEntry.COLUMN_TAG, event.getString(SCHEDULE_TAG));
 
@@ -160,9 +160,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             contentResolver.delete(ScheduleEntry.CONTENT_URI, null, null);
-            contentResolver.bulkInsert(ScheduleEntry.CONTENT_URI, scheduleArray);
+            int scheduleInserted = contentResolver.bulkInsert(ScheduleEntry.CONTENT_URI, scheduleArray);
 
-            Log.d(LOG_TAG, "Synced " + (updatesArray.length + scheduleArray.length) + " items.");
+            Log.d(LOG_TAG, "Synced " + (updatesInserted + scheduleInserted) + " items.");
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Error while inserting JSON data.");
             e.printStackTrace();

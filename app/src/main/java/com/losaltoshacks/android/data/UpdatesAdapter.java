@@ -8,104 +8,52 @@
 package com.losaltoshacks.android.data;
 
 import android.content.Context;
-import android.util.Log;
+import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import com.losaltoshacks.android.R;
+import com.losaltoshacks.android.UpdatesFragment;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-public class UpdatesAdapter extends BaseAdapter {
+public class UpdatesAdapter extends CursorAdapter {
     private static final String LOG_TAG = UpdatesAdapter.class.getSimpleName();
-    private JSONArray updates;
-    private LayoutInflater layoutInflater;
 
-    public UpdatesAdapter(Context context, JSONArray updates) {
-        layoutInflater = LayoutInflater.from(context);
-        this.updates = updates;
+    public UpdatesAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        JSONObject update = getItem(position);
-        if (update == null ) {
-            Log.e(LOG_TAG, "Could not get item");
-            return null;
-        }
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        View view = LayoutInflater.from(context).inflate(R.layout.list_item_updates, parent, false);
 
-        ViewHolder viewHolder;
-        if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.list_item_updates, parent, false);
-            viewHolder = new ViewHolder(convertView);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
+        ViewHolder viewHolder = new ViewHolder(view);
+        view.setTag(viewHolder);
 
-        try {
-            viewHolder.mTitle.setText(update.getString("title"));
-            viewHolder.mDescription.setText(update.getString("description"));
-            viewHolder.mDate.setText(update.getString("date"));
-            viewHolder.mTag.setText(update.getString("tag"));
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "Could not parse update");
-            e.printStackTrace();
-        }
-        return convertView;
-    }
-
-    public void swapData(JSONArray data) {
-        Log.d(LOG_TAG, "Swapping data");
-        updates = data;
-        if (data != null) {
-            notifyDataSetChanged();
-        } else {
-            notifyDataSetInvalidated();
-        }
+        return view;
     }
 
     @Override
-    public int getCount() {
-        if (updates != null) {
-            return updates.length();
-        } else {
-            return 0;
-        }
-    }
+    public void bindView(View view, Context context, Cursor cursor) {
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-    @Override
-    public JSONObject getItem(int position) {
-        if (updates != null) {
-            try {
-                return updates.getJSONObject(position);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, "Failed to get update object");
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
+        viewHolder.mTitle.setText(cursor.getString(UpdatesFragment.COL_UPDATE_TITLE));
+        viewHolder.mDescription.setText(cursor.getString(UpdatesFragment.COL_UPDATE_DESCRIPTION));
+        viewHolder.mTime.setText(Integer.toString(cursor.getInt(UpdatesFragment.COL_UPDATE_TIME)));
+        viewHolder.mTag.setText(cursor.getString(UpdatesFragment.COL_UPDATE_TAG));
     }
 
     private static class ViewHolder {
         public TextView mTitle;
         public TextView mDescription;
-        public TextView mDate;
+        public TextView mTime;
         public TextView mTag;
         public ViewHolder(View view) {
             mTitle = (TextView) view.findViewById(R.id.updates_title);
             mDescription = (TextView) view.findViewById(R.id.updates_description);
-            mDate = (TextView) view.findViewById(R.id.updates_date);
+            mTime = (TextView) view.findViewById(R.id.updates_time);
             mTag = (TextView) view.findViewById(R.id.updates_tag);
         }
     }

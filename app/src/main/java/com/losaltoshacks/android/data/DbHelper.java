@@ -46,7 +46,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 UpdatesEntry._ID + " INTEGER PRIMARY KEY," +
                 UpdatesEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
                 UpdatesEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
-                UpdatesEntry.COLUMN_DATE + "INTEGER NOT NULL, " +
+                UpdatesEntry.COLUMN_TIME + " INTEGER NOT NULL, " +
                 UpdatesEntry.COLUMN_TAG + " TEXT NOT NULL " +
                 " );";
 

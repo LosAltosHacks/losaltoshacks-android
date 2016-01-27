@@ -30,17 +30,19 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.util.Log;
 
 public class Provider extends ContentProvider {
+    private static final String LOG_TAG = Provider.class.getSimpleName();
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private DbHelper mOpenHelper;
 
     static final int UPDATES = 100;
     static final int SCHEDULE = 200;
-    static final int SCHEDULE_WITH_START_DATE = 201;
+    static final int SCHEDULE_WITH_START_TIME = 201;
 
-    private static final String sScheduleWithStartDateSelection =
+    private static final String sScheduleWithStartTimeSelection =
             Contract.ScheduleEntry.TABLE_NAME +
                     "." + Contract.ScheduleEntry.COLUMN_TIME + " >= ? ";
 
@@ -50,7 +52,7 @@ public class Provider extends ContentProvider {
 
         matcher.addURI(authority, Contract.PATH_UPDATES, UPDATES);
         matcher.addURI(authority, Contract.PATH_SCHEDULE, SCHEDULE);
-        matcher.addURI(authority, Contract.PATH_SCHEDULE + "/#", SCHEDULE_WITH_START_DATE);
+        matcher.addURI(authority, Contract.PATH_SCHEDULE + "/#", SCHEDULE_WITH_START_TIME);
         return matcher;
     }
 
@@ -69,7 +71,7 @@ public class Provider extends ContentProvider {
                 return Contract.UpdatesEntry.CONTENT_TYPE;
             case SCHEDULE:
                 return Contract.ScheduleEntry.CONTENT_TYPE;
-            case SCHEDULE_WITH_START_DATE:
+            case SCHEDULE_WITH_START_TIME:
                 return Contract.ScheduleEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -105,14 +107,14 @@ public class Provider extends ContentProvider {
                 );
                 break;
             }
-            case SCHEDULE_WITH_START_DATE: {
-                long date = Contract.ScheduleEntry.getDateFromUri(uri);
+            case SCHEDULE_WITH_START_TIME: {
+                long time = Contract.ScheduleEntry.getTimeFromUri(uri);
 
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         Contract.ScheduleEntry.TABLE_NAME,
                         projection,
-                        sScheduleWithStartDateSelection,
-                        new String[]{Long.toString(date)},
+                        sScheduleWithStartTimeSelection,
+                        new String[]{Long.toString(time)},
                         null,
                         null,
                         sortOrder
@@ -124,6 +126,7 @@ public class Provider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+
         return retCursor;
     }
 
@@ -154,11 +157,13 @@ public class Provider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         getContext().getContentResolver().notifyChange(uri, null);
+        Log.d(LOG_TAG, "Inserted: " + returnUri);
         return returnUri;
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
+        Log.d(LOG_TAG, "delete: " + uri);
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         int rowsDeleted;
@@ -180,6 +185,7 @@ public class Provider extends ContentProvider {
         if (rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
+        Log.d(LOG_TAG, "Deleted " + rowsDeleted + " items.");
         return rowsDeleted;
     }
 
@@ -227,6 +233,7 @@ public class Provider extends ContentProvider {
                     db.endTransaction();
                 }
                 getContext().getContentResolver().notifyChange(uri, null);
+                Log.d(LOG_TAG, "Bulk inserted " + returnCount + " updates");
                 return returnCount;
             case SCHEDULE:
                 db.beginTransaction();
@@ -242,6 +249,7 @@ public class Provider extends ContentProvider {
                     db.endTransaction();
                 }
                 getContext().getContentResolver().notifyChange(uri, null);
+                Log.d(LOG_TAG, "Bulk inserted " + returnCount + " schedule items");
                 return returnCount;
             default:
                 return super.bulkInsert(uri, values);
