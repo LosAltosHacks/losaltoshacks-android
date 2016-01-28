@@ -80,14 +80,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Log.d(LOG_TAG, "onPerformSync");
         Context context = getContext();
 
-        JSONArray updates = downloadJSONFromURL(context.getString(R.string.sync_updates_url)),
-                schedule = downloadJSONFromURL(context.getString(R.string.sync_schedule_url));
+        insertJSONData(downloadJSONFromURL(context.getString(R.string.sync_updates_url)),
+                downloadJSONFromURL(context.getString(R.string.sync_schedule_url)),
+                context);
 
-        if (updates != null && schedule != null) {
-            insertJSONData(updates, schedule, context);
-        } else {
-            Log.e(LOG_TAG, "Failed to download updates or schedule JSON.");
-        }
+        Log.d(LOG_TAG, "Sync finished.");
     }
 
     private JSONArray downloadJSONFromURL(String urlString) {
@@ -110,6 +107,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             Log.e(LOG_TAG, "Invalid JSON data from URL: " + url.toString());
             e.printStackTrace();
         } catch (IOException e) {
+            Log.e(LOG_TAG, "Failed to download JSON data from URL: " + url.toString());
             e.printStackTrace();
         } finally {
             if (httpURLConnection != null) {
@@ -133,45 +131,51 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         ContentResolver contentResolver = context.getContentResolver();
 
         try {
-            ContentValues[] updatesArray = new ContentValues[updatesJSON.length()];
-            for (int i = 0; i < updatesJSON.length(); i++) {
-                JSONObject update = updatesJSON.getJSONObject(i);
+            if (updatesJSON != null) {
+                ContentValues[] updatesArray = new ContentValues[updatesJSON.length()];
+                for (int i = 0; i < updatesJSON.length(); i++) {
+                    JSONObject update = updatesJSON.getJSONObject(i);
 
-                ContentValues updateValues = new ContentValues();
+                    ContentValues updateValues = new ContentValues();
 
-                updateValues.put(UpdatesEntry.COLUMN_TITLE, update.getString(UPDATES_TITLE));
-                updateValues.put(UpdatesEntry.COLUMN_DESCRIPTION, update.getString(UPDATES_DESCRIPTION));
-                updateValues.put(UpdatesEntry.COLUMN_TIME, update.getInt(UPDATES_TIME));
-                updateValues.put(UpdatesEntry.COLUMN_TAG, update.getString(UPDATES_TAG));
+                    updateValues.put(UpdatesEntry.COLUMN_TITLE, update.getString(UPDATES_TITLE));
+                    updateValues.put(UpdatesEntry.COLUMN_DESCRIPTION, update.getString(UPDATES_DESCRIPTION));
+                    updateValues.put(UpdatesEntry.COLUMN_TIME, update.getInt(UPDATES_TIME));
+                    updateValues.put(UpdatesEntry.COLUMN_TAG, update.getString(UPDATES_TAG));
 
-                updatesArray[i] = updateValues;
+                    updatesArray[i] = updateValues;
+                }
+
+                Bundle updatesBundle = new Bundle();
+                updatesBundle.putParcelableArray(Provider.CONTENT_VALUES_ARRAY, updatesArray);
+                contentResolver.call(UpdatesEntry.CONTENT_URI,
+                        Provider.BULK_DELETE_AND_INSERT, UpdatesEntry.CONTENT_URI.toString(), updatesBundle);
+            } else {
+                Log.e(LOG_TAG, "Could not insert updates data because it was null.");
             }
 
-            Bundle updatesBundle = new Bundle();
-            updatesBundle.putParcelableArray(Provider.CONTENT_VALUES_ARRAY, updatesArray);
-            contentResolver.call(UpdatesEntry.CONTENT_URI,
-                    Provider.BULK_DELETE_AND_INSERT, UpdatesEntry.CONTENT_URI.toString(), updatesBundle);
+            if (scheduleJSON != null) {
+                ContentValues[] scheduleArray = new ContentValues[scheduleJSON.length()];
+                for (int i = 0; i < scheduleJSON.length(); i++) {
+                    JSONObject event = scheduleJSON.getJSONObject(i);
 
-            ContentValues[] scheduleArray = new ContentValues[scheduleJSON.length()];
-            for (int i = 0; i < scheduleJSON.length(); i++) {
-                JSONObject event = scheduleJSON.getJSONObject(i);
+                    ContentValues scheduleValues = new ContentValues();
 
-                ContentValues scheduleValues = new ContentValues();
+                    scheduleValues.put(ScheduleEntry.COLUMN_EVENT, event.getString(SCHEDULE_EVENT));
+                    scheduleValues.put(ScheduleEntry.COLUMN_TIME, event.getInt(SCHEDULE_TIME));
+                    scheduleValues.put(ScheduleEntry.COLUMN_LOCATION, event.getString(SCHEDULE_LOCATION));
+                    scheduleValues.put(ScheduleEntry.COLUMN_TAG, event.getString(SCHEDULE_TAG));
 
-                scheduleValues.put(ScheduleEntry.COLUMN_EVENT, event.getString(SCHEDULE_EVENT));
-                scheduleValues.put(ScheduleEntry.COLUMN_TIME, event.getInt(SCHEDULE_TIME));
-                scheduleValues.put(ScheduleEntry.COLUMN_LOCATION, event.getString(SCHEDULE_LOCATION));
-                scheduleValues.put(ScheduleEntry.COLUMN_TAG, event.getString(SCHEDULE_TAG));
+                    scheduleArray[i] = scheduleValues;
+                }
 
-                scheduleArray[i] = scheduleValues;
+                Bundle scheduleBundle = new Bundle();
+                scheduleBundle.putParcelableArray(Provider.CONTENT_VALUES_ARRAY, scheduleArray);
+                contentResolver.call(ScheduleEntry.CONTENT_URI,
+                        Provider.BULK_DELETE_AND_INSERT, ScheduleEntry.CONTENT_URI.toString(), scheduleBundle);
+            } else {
+                Log.e(LOG_TAG, "Could not insert schedule data because it was null.");
             }
-
-            Bundle scheduleBundle = new Bundle();
-            scheduleBundle.putParcelableArray(Provider.CONTENT_VALUES_ARRAY, scheduleArray);
-            contentResolver.call(ScheduleEntry.CONTENT_URI,
-                    Provider.BULK_DELETE_AND_INSERT, ScheduleEntry.CONTENT_URI.toString(), scheduleBundle);
-
-            Log.d(LOG_TAG, "Sync complete.");
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Failed to parse JSON data.");
             e.printStackTrace();
