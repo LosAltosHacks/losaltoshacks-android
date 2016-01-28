@@ -30,10 +30,16 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 
 public class Provider extends ContentProvider {
     private static final String LOG_TAG = Provider.class.getSimpleName();
+
+    public static final String BULK_DELETE_AND_INSERT = "bulkDeleteAndInsert";
+    public static final String CONTENT_VALUES_ARRAY = "contentValuesArray";
+    public static final String ROWS_INSERTED = "rowsInserted";
+    public static final String ROWS_DELETED = "rowsDeleted";
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private DbHelper mOpenHelper;
@@ -213,7 +219,63 @@ public class Provider extends ContentProvider {
         return rowsUpdated;
     }
 
-    @Override
+    public Bundle call(String method, String arg, Bundle extras) {
+        if (method.equals(BULK_DELETE_AND_INSERT)) {
+            final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+            final Uri uri = Uri.parse(arg);
+            final int match = sUriMatcher.match(uri);
+            final ContentValues[] contentValues =
+                    (ContentValues[]) extras.getParcelableArray(CONTENT_VALUES_ARRAY);
+            int rowsInserted = 0,
+                    rowsDeleted;
+            switch (match) {
+                case UPDATES:
+                    db.beginTransaction();
+                    try {
+                        rowsDeleted = db.delete(Contract.UpdatesEntry.TABLE_NAME, null, null);
+                        for (ContentValues value : contentValues) {
+                            long _id = db.insert(Contract.UpdatesEntry.TABLE_NAME, null, value);
+                            if (_id != -1) {
+                                rowsInserted++;
+                            }
+                        }
+                        db.setTransactionSuccessful();
+                    } finally {
+                        db.endTransaction();
+                    }
+                    getContext().getContentResolver().notifyChange(uri, null);
+                    Log.d(LOG_TAG, String.format(
+                            "Deleted %d updates and inserted %d", rowsDeleted, rowsInserted));
+                    break;
+                case SCHEDULE:
+                    db.beginTransaction();
+                    try {
+                        rowsDeleted = db.delete(Contract.ScheduleEntry.TABLE_NAME, null, null);
+                        for (ContentValues value : contentValues) {
+                            long _id = db.insert(Contract.ScheduleEntry.TABLE_NAME, null, value);
+                            if (_id != -1) {
+                                rowsInserted++;
+                            }
+                        }
+                        db.setTransactionSuccessful();
+                    } finally {
+                        db.endTransaction();
+                    }
+                    getContext().getContentResolver().notifyChange(uri, null);
+                    Log.d(LOG_TAG, String.format(
+                            "Deleted %d schedule items and inserted %d", rowsDeleted, rowsInserted));
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid table name arg: " + arg);
+            }
+            Bundle rowInfo = new Bundle();
+            rowInfo.putInt(ROWS_DELETED, rowsDeleted);
+            rowInfo.putInt(ROWS_INSERTED, rowsInserted);
+            return rowInfo;
+        }
+        return null;
+    }
+
     public int bulkInsert(Uri uri, ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);

@@ -38,6 +38,7 @@ import android.util.Log;
 import com.losaltoshacks.android.R;
 import com.losaltoshacks.android.data.Contract.ScheduleEntry;
 import com.losaltoshacks.android.data.Contract.UpdatesEntry;
+import com.losaltoshacks.android.data.Provider;
 import com.losaltoshacks.android.data.Utility;
 
 import org.json.JSONArray;
@@ -79,10 +80,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Log.d(LOG_TAG, "onPerformSync");
         Context context = getContext();
 
-        insertJSONData(
-                downloadJSONFromURL(context.getString(R.string.sync_updates_url)),
-                downloadJSONFromURL(context.getString(R.string.sync_schedule_url)),
-                context);
+        JSONArray updates = downloadJSONFromURL(context.getString(R.string.sync_updates_url)),
+                schedule = downloadJSONFromURL(context.getString(R.string.sync_schedule_url));
+
+        if (updates != null && schedule != null) {
+            insertJSONData(updates, schedule, context);
+        } else {
+            Log.e(LOG_TAG, "Failed to download updates or schedule JSON.");
+        }
     }
 
     private JSONArray downloadJSONFromURL(String urlString) {
@@ -142,8 +147,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 updatesArray[i] = updateValues;
             }
 
-            contentResolver.delete(UpdatesEntry.CONTENT_URI, null, null);
-            int updatesInserted = contentResolver.bulkInsert(UpdatesEntry.CONTENT_URI, updatesArray);
+            Bundle updatesBundle = new Bundle();
+            updatesBundle.putParcelableArray(Provider.CONTENT_VALUES_ARRAY, updatesArray);
+            contentResolver.call(UpdatesEntry.CONTENT_URI,
+                    Provider.BULK_DELETE_AND_INSERT, UpdatesEntry.CONTENT_URI.toString(), updatesBundle);
 
             ContentValues[] scheduleArray = new ContentValues[scheduleJSON.length()];
             for (int i = 0; i < scheduleJSON.length(); i++) {
@@ -159,12 +166,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 scheduleArray[i] = scheduleValues;
             }
 
-            contentResolver.delete(ScheduleEntry.CONTENT_URI, null, null);
-            int scheduleInserted = contentResolver.bulkInsert(ScheduleEntry.CONTENT_URI, scheduleArray);
+            Bundle scheduleBundle = new Bundle();
+            scheduleBundle.putParcelableArray(Provider.CONTENT_VALUES_ARRAY, scheduleArray);
+            contentResolver.call(ScheduleEntry.CONTENT_URI,
+                    Provider.BULK_DELETE_AND_INSERT, ScheduleEntry.CONTENT_URI.toString(), scheduleBundle);
 
-            Log.d(LOG_TAG, "Synced " + (updatesInserted + scheduleInserted) + " items.");
+            Log.d(LOG_TAG, "Sync complete.");
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Error while inserting JSON data.");
+            Log.e(LOG_TAG, "Failed to parse JSON data.");
             e.printStackTrace();
         }
     }
