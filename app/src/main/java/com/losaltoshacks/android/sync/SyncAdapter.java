@@ -191,6 +191,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     public static Account getSyncAccount(Context context) {
+        Log.d(LOG_TAG, "getSyncAccount");
         Account newAccount = new Account(context.getString(R.string.app_name),
                 context.getString(R.string.sync_account_type));
 
@@ -205,4 +206,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         }
         return newAccount;
     }
+
+
 }

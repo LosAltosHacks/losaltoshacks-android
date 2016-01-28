@@ -7,25 +7,24 @@
 
 package com.losaltoshacks.android;
 
+import android.app.ListFragment;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
+import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+import android.widget.CursorAdapter;
 
 import com.losaltoshacks.android.data.Contract;
 import com.losaltoshacks.android.data.Contract.UpdatesEntry;
 import com.losaltoshacks.android.data.UpdatesAdapter;
 
-public class UpdatesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class UpdatesFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String LOG_TAG = UpdatesFragment.class.getSimpleName();
-    private UpdatesAdapter mUpdatesAdapter;
     private static final int UPDATES_LOADER = 0;
 
     public static final String[] UPDATES_COLUMNS = {
@@ -48,25 +47,15 @@ public class UpdatesFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_updates, container, false);
 
-        ListView listView = (ListView) view.findViewById(R.id.updates_listview);
-        mUpdatesAdapter = new UpdatesAdapter(getActivity(), null, 0);
-        listView.setAdapter(mUpdatesAdapter);
-
-        return view;
+        return inflater.inflate(R.layout.fragment_updates, container, false);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setListAdapter(new UpdatesAdapter(getActivity(), null, 0));
         getLoaderManager().initLoader(UPDATES_LOADER, null, this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        getLoaderManager().restartLoader(UPDATES_LOADER, null, this);
     }
 
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
@@ -82,12 +71,12 @@ public class UpdatesFragment extends Fragment implements LoaderManager.LoaderCal
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         Log.d(LOG_TAG, "onLoadFinished");
         Log.d(LOG_TAG, "Loaded " + cursor.getCount() + " rows");
-        mUpdatesAdapter.swapCursor(cursor);
+        ((CursorAdapter) getListAdapter()).swapCursor(cursor);
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.d(LOG_TAG, "onLoaderReset");
-        mUpdatesAdapter.swapCursor(null);
+        ((CursorAdapter) getListAdapter()).swapCursor(null);
     }
 
 }

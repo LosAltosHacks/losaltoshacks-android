@@ -12,6 +12,8 @@ package com.losaltoshacks.android;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -24,6 +26,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.losaltoshacks.android.data.Contract;
+import com.losaltoshacks.android.data.DbHelper;
 import com.losaltoshacks.android.onesignal.NotificationHandler;
 import com.losaltoshacks.android.sync.SyncAdapter;
 import com.onesignal.OneSignal;
@@ -46,10 +50,12 @@ public class MainActivity extends AppCompatActivity {
 
         checkIfPlayServicesAvailable();
         OneSignal.startInit(this).setNotificationOpenedHandler(new NotificationHandler()).init();
+
+        checkDb();
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getFragmentManager());
         viewPagerAdapter.addFragment(new DashboardFragment(), "Dashboard");
         viewPagerAdapter.addFragment(new ScheduleFragment(), "Schedule");
         viewPagerAdapter.addFragment(new UpdatesFragment(), "Updates");
@@ -105,5 +111,18 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         }
+    }
+
+    private void checkDb() {
+        final SQLiteDatabase db = (new DbHelper(this)).getReadableDatabase();
+
+        Cursor updatesCursor = db.rawQuery("SELECT * FROM " + Contract.UpdatesEntry.TABLE_NAME, null),
+                scheduleCursor = db.rawQuery("SELECT * FROM " + Contract.ScheduleEntry.TABLE_NAME, null);
+
+        if (!updatesCursor.moveToFirst() || !scheduleCursor.moveToFirst()) {
+            SyncAdapter.syncImmediately(this);
+        }
+        updatesCursor.close();
+        scheduleCursor.close();
     }
 }

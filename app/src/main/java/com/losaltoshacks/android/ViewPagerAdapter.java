@@ -10,9 +10,9 @@
 
 package com.losaltoshacks.android;
 
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.app.FragmentManager;
+import android.app.Fragment;
+import android.support.v13.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
