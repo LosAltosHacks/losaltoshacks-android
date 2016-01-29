@@ -7,13 +7,12 @@
 
 package com.losaltoshacks.android;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -21,6 +20,8 @@ import java.util.GregorianCalendar;
 
 public class DashboardFragment extends Fragment {
     private DashboardCountdown mDashboardCountdown;
+    private TextView mCountdownText;
+    private TextView mCountdownTime;
 
     public DashboardFragment() {
     }
@@ -30,7 +31,21 @@ public class DashboardFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
-        long millisUntilFinished, duration;
+        mCountdownText = (TextView) rootView.findViewById(R.id.countdown_text);
+        mCountdownTime = (TextView) rootView.findViewById(R.id.countdown_time);
+
+        createCountdown();
+
+        return rootView;
+    }
+
+    private void createCountdown() {
+        if (mDashboardCountdown != null) {
+            mDashboardCountdown.cancel();
+        }
+
+        long millisUntilFinished;
+        boolean started;
 
         Calendar now = new GregorianCalendar(),
                 start = new GregorianCalendar(2016, Calendar.JANUARY, 30, 13, 0),
@@ -39,22 +54,20 @@ public class DashboardFragment extends Fragment {
         // If the hackathon hasn't started yet we display a countdown to it
         if (now.compareTo(start) == -1) {
             millisUntilFinished = start.getTimeInMillis() - now.getTimeInMillis();
-            duration = 0;
+            started = false;
         } else {
             millisUntilFinished = finish.getTimeInMillis() - now.getTimeInMillis();
-            duration = finish.getTimeInMillis() - start.getTimeInMillis();
+            started = true;
         }
 
         mDashboardCountdown = new DashboardCountdown(
                 millisUntilFinished,
-                duration,
-                (TextView) rootView.findViewById(R.id.countdown_textview),
-                (ProgressBar) rootView.findViewById(R.id.progress_bar)
+                started,
+                mCountdownText,
+                mCountdownTime
         );
 
         mDashboardCountdown.start();
-
-        return rootView;
     }
 
     @Override
@@ -65,18 +78,24 @@ public class DashboardFragment extends Fragment {
 
     private class DashboardCountdown extends CountDownTimer {
         public final String LOG_TAG = DashboardCountdown.class.getSimpleName();
-        TextView countdownView;
-        ProgressBar progressBar;
-        long duration;
+        TextView countdownTime;
+        TextView countdownText;
+        boolean started;
 
-        public DashboardCountdown(long millisUntilFinished, long duration,
-                                  TextView countdownView, ProgressBar progressBar) {
+        public DashboardCountdown(long millisUntilFinished, boolean started,
+                                  TextView countdownText, TextView countdownTime) {
 
             super(millisUntilFinished, 1000);
 
-            this.countdownView = countdownView;
-            this.progressBar = progressBar;
-            this.duration = duration;
+            this.countdownText = countdownText;
+            this.countdownTime = countdownTime;
+            this.started = started;
+
+            if (started) {
+                countdownText.setText("Hacking ends in:");
+            } else {
+                countdownText.setText("Los Altos Hacks begins in:");
+            }
         }
 
         @Override
@@ -87,24 +106,20 @@ public class DashboardFragment extends Fragment {
                     seconds = secondsLeft % 60;
 
             if (hours > 0) {
-                countdownView.setText(String.format("%d:%02d:%02d", hours, minutes, seconds));
+                countdownTime.setText(String.format("%d:%02d:%02d", hours, minutes, seconds));
             } else {
-                countdownView.setText(String.format("%02d:%02d", minutes, seconds));
-            }
-
-            // If duration is 0, set the progress bar to 0
-            if (duration != 0) {
-                double percentComplete = 1 - millisUntilFinished / (double) duration;
-                progressBar.setProgress((int) Math.floor(percentComplete * progressBar.getMax()));
-            } else {
-                progressBar.setProgress(0);
+                countdownTime.setText(String.format("%02d:%02d", minutes, seconds));
             }
         }
 
         @Override
         public void onFinish() {
-            countdownView.setText(getString(R.string.timer_finished));
-            progressBar.setProgress(100);
+            if (!started) {
+                createCountdown();
+            } else {
+                countdownTime.setText(getString(R.string.timer_finished));
+                countdownText.setText("Hacking is over!");
+            }
         }
     }
 }
