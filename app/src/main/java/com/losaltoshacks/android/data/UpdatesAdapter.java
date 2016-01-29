@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
+import com.github.curioustechizen.ago.RelativeTimeTextView;
 import com.losaltoshacks.android.R;
 import com.losaltoshacks.android.UpdatesFragment;
 
@@ -41,20 +42,17 @@ public class UpdatesAdapter extends CursorAdapter {
 
         viewHolder.mTitle.setText(cursor.getString(UpdatesFragment.COL_UPDATE_TITLE));
         viewHolder.mDescription.setText(cursor.getString(UpdatesFragment.COL_UPDATE_DESCRIPTION));
-        viewHolder.mTime.setText(Integer.toString(cursor.getInt(UpdatesFragment.COL_UPDATE_TIME)));
-        viewHolder.mTag.setText(cursor.getString(UpdatesFragment.COL_UPDATE_TAG));
+        viewHolder.mTime.setReferenceTime(cursor.getLong(UpdatesFragment.COL_UPDATE_TIME) * 1000);
     }
 
     private static class ViewHolder {
         public TextView mTitle;
         public TextView mDescription;
-        public TextView mTime;
-        public TextView mTag;
+        public RelativeTimeTextView mTime;
         public ViewHolder(View view) {
             mTitle = (TextView) view.findViewById(R.id.updates_title);
             mDescription = (TextView) view.findViewById(R.id.updates_description);
-            mTime = (TextView) view.findViewById(R.id.updates_time);
-            mTag = (TextView) view.findViewById(R.id.updates_tag);
+            mTime = (RelativeTimeTextView) view.findViewById(R.id.updates_time);
         }
     }
 }
