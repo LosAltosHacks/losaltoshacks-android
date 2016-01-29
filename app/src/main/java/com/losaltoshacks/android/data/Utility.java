@@ -13,6 +13,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class Utility {
     private static final String LOG_TAG = Utility.class.getSimpleName();
@@ -42,5 +46,11 @@ public class Utility {
             }
         }
         return data;
+    }
+
+    public static String formatTimestamp(long time, String format) {
+        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
+        sdf.setTimeZone(TimeZone.getDefault());
+        return sdf.format(new Date(time * 1000));
     }
 }

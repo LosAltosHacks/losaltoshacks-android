@@ -6,7 +6,8 @@ file, or at http://opensource.org/licenses/ISC.
 
 This app includes code from the following sources:
 
-AppListLoader (https://github.com/alexjlockwood/AppListLoader)
+AppListLoader
+(https://github.com/alexjlockwood/AppListLoader)
 Copyright (c) 2012 Alex Lockwood
 Licensed under the MIT License
 
@@ -23,4 +24,16 @@ Licensed under the Apache License 2.0
 Transferring Data Using Sync Adapters
 (https://developer.android.com/training/sync-adapters/)
 Copyright (c) 2016, The Android Open Source Project
+Licensed under the Apache License 2.0
+
+This app includes the following libraries:
+
+OneSignal Android Push Notification Plugin
+(https://github.com/one-signal/OneSignal-Android-SDK)
+Copyright 2015 OneSignal
+Licensed under a modified MIT License
+
+SectionCursorAdapter
+(https://github.com/twotoasters/SectionCursorAdapter)
+Copyright 2014 Two Toasters
 Licensed under the Apache License 2.0

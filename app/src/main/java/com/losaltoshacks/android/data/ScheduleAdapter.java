@@ -9,52 +9,72 @@ package com.losaltoshacks.android.data;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import com.losaltoshacks.android.R;
 import com.losaltoshacks.android.ScheduleFragment;
+import com.twotoasters.sectioncursoradapter.adapter.SectionCursorAdapter;
+import com.twotoasters.sectioncursoradapter.adapter.viewholder.ViewHolder;
 
-public class ScheduleAdapter extends CursorAdapter {
+public class ScheduleAdapter extends SectionCursorAdapter<String, ScheduleAdapter.SectionViewHolder, ScheduleAdapter.ItemViewHolder> {
     private static final String LOG_TAG = ScheduleAdapter.class.getSimpleName();
 
     public ScheduleAdapter(Context context, Cursor c, int flags) {
-        super(context, c, flags);
+        super(context, c, flags, R.layout.list_section_schedule, R.layout.list_item_schedule);
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.list_item_schedule, parent, false);
-
-        ViewHolder viewHolder = new ViewHolder(view);
-        view.setTag(viewHolder);
-
-        return view;
+    protected ItemViewHolder createItemViewHolder(Cursor cursor, View itemView) {
+        return new ItemViewHolder(itemView);
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
-
-        viewHolder.mEvent.setText(cursor.getString(ScheduleFragment.COL_SCHEDULE_EVENT));
-        viewHolder.mLocation.setText(cursor.getString(ScheduleFragment.COL_SCHEDULE_LOCATION));
-        viewHolder.mTime.setText(Integer.toString(cursor.getInt(ScheduleFragment.COL_SCHEDULE_TIME)));
-        viewHolder.mTag.setText(cursor.getString(ScheduleFragment.COL_SCHEDULE_TAG));
+    protected void bindItemViewHolder(ItemViewHolder itemViewHolder, Cursor cursor, ViewGroup parent) {
+        itemViewHolder.mEvent.setText(cursor.getString(ScheduleFragment.COL_SCHEDULE_EVENT));
+        itemViewHolder.mLocation.setText(cursor.getString(ScheduleFragment.COL_SCHEDULE_LOCATION));
+        itemViewHolder.mTime.setText(Integer.toString(cursor.getInt(ScheduleFragment.COL_SCHEDULE_TIME)));
+        itemViewHolder.mTag.setText(cursor.getString(ScheduleFragment.COL_SCHEDULE_TAG));
     }
 
-    private static class ViewHolder {
+    @Override
+    protected String getSectionFromCursor(Cursor cursor) {
+        return Utility.formatTimestamp(cursor.getLong(ScheduleFragment.COL_SCHEDULE_TIME),
+                "EEEE, LLLL d");
+    }
+
+    @Override
+    protected SectionViewHolder createSectionViewHolder(View sectionView, String section) {
+        return new SectionViewHolder(sectionView);
+    }
+
+    @Override
+    protected void bindSectionViewHolder(int position, SectionViewHolder sectionViewHolder,
+                                         ViewGroup parent, String section) {
+        sectionViewHolder.mTitle.setText(section);
+    }
+
+    public static class ItemViewHolder extends ViewHolder {
         public TextView mEvent;
         public TextView mLocation;
         public TextView mTime;
         public TextView mTag;
-        public ViewHolder(View view) {
-            mEvent = (TextView) view.findViewById(R.id.schedule_event);
-            mLocation = (TextView) view.findViewById(R.id.schedule_location);
-            mTime = (TextView) view.findViewById(R.id.schedule_time);
-            mTag = (TextView) view.findViewById(R.id.schedule_tag);
+        public ItemViewHolder(View view) {
+            super(view);
+            mEvent = findWidgetById(R.id.schedule_event);
+            mLocation = findWidgetById(R.id.schedule_location);
+            mTime = findWidgetById(R.id.schedule_time);
+            mTag = findWidgetById(R.id.schedule_tag);
+        }
+    }
+
+    public static class SectionViewHolder extends ViewHolder {
+        public TextView mTitle;
+        public SectionViewHolder(View view) {
+            super(view);
+            mTitle = findWidgetById(R.id.schedule_section);
+            System.out.println(mTitle);
         }
     }
 }
