@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getFragmentManager());
-        viewPagerAdapter.addFragment(new DashboardFragment(), "Dashboard");
+        viewPagerAdapter.addFragment(new DashboardFragment(), "Dash board");
         viewPagerAdapter.addFragment(new ScheduleFragment(), "Schedule");
         viewPagerAdapter.addFragment(new UpdatesFragment(), "Updates");
         viewPagerAdapter.addFragment(new MapFragment(), "Map");
