@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="@dimen/list_side_margin"
+    android:paddingRight="@dimen/list_side_margin"
+    android:paddingTop="@dimen/list_top_bot_margin"
+    android:paddingBottom="@dimen/list_top_bot_margin">
 
     <LinearLayout
         android:orientation="vertical"
@@ -12,12 +17,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/schedule_time" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/schedule_tag" />
+            android:id="@+id/schedule_time"
+            android:textSize="13sp"
+            android:textColor="#212121"/>
     </LinearLayout>
 
     <LinearLayout
@@ -29,12 +31,18 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/schedule_event" />
+            android:id="@+id/schedule_event"
+            android:fontFamily="sans-serif"
+            android:textSize="14sp"
+            android:textColor="#212121"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/schedule_location" />
+            android:id="@+id/schedule_location"
+            android:fontFamily="sans-serif"
+            android:textSize="13sp"
+            android:textColor="#757575"/>
     </LinearLayout>
 
 </LinearLayout>

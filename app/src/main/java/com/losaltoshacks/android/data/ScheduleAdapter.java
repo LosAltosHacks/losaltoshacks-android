@@ -34,8 +34,9 @@ public class ScheduleAdapter extends SectionCursorAdapter<String, ScheduleAdapte
     protected void bindItemViewHolder(ItemViewHolder itemViewHolder, Cursor cursor, ViewGroup parent) {
         itemViewHolder.mEvent.setText(cursor.getString(ScheduleFragment.COL_SCHEDULE_EVENT));
         itemViewHolder.mLocation.setText(cursor.getString(ScheduleFragment.COL_SCHEDULE_LOCATION));
-        itemViewHolder.mTime.setText(Integer.toString(cursor.getInt(ScheduleFragment.COL_SCHEDULE_TIME)));
-        itemViewHolder.mTag.setText(cursor.getString(ScheduleFragment.COL_SCHEDULE_TAG));
+        itemViewHolder.mTime.setText(
+                Utility.formatTimestamp(cursor.getInt(ScheduleFragment.COL_SCHEDULE_TIME),
+                        "h:mm a"));
     }
 
     @Override
@@ -65,7 +66,6 @@ public class ScheduleAdapter extends SectionCursorAdapter<String, ScheduleAdapte
             mEvent = findWidgetById(R.id.schedule_event);
             mLocation = findWidgetById(R.id.schedule_location);
             mTime = findWidgetById(R.id.schedule_time);
-            mTag = findWidgetById(R.id.schedule_tag);
         }
     }
 
