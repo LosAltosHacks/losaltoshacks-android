@@ -20,6 +20,7 @@ import java.util.TimeZone;
 
 public class Utility {
     private static final String LOG_TAG = Utility.class.getSimpleName();
+    public static boolean openUpdates = false;
 
     public static String readInputStream(InputStream is) {
         BufferedReader bufferedReader = null;

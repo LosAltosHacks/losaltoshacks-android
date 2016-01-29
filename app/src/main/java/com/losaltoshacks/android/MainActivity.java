@@ -28,12 +28,13 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.losaltoshacks.android.data.Contract;
 import com.losaltoshacks.android.data.DbHelper;
-import com.losaltoshacks.android.onesignal.NotificationHandler;
+import com.losaltoshacks.android.data.Utility;
 import com.losaltoshacks.android.sync.SyncAdapter;
 import com.onesignal.OneSignal;
 
 public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,16 +43,18 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
-        setupViewPager(viewPager);
+        mViewPager = (ViewPager) findViewById(R.id.view_pager);
+        setupViewPager(mViewPager);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setupWithViewPager(mViewPager);
 
         checkIfPlayServicesAvailable();
-        OneSignal.startInit(this).setNotificationOpenedHandler(new NotificationHandler()).init();
+        OneSignal.startInit(this).init();
 
         checkDb();
+
+        checkForNotification();
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -67,6 +70,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         checkIfPlayServicesAvailable();
+        checkForNotification();
+    }
+
+    private void checkForNotification() {
+        if (Utility.openUpdates) {
+            Utility.openUpdates = false;
+            Log.d(LOG_TAG, "Opening updates fragment because notification was opened.");
+            mViewPager.setCurrentItem(2);
+        }
     }
 
     @Override

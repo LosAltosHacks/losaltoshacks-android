@@ -74,7 +74,6 @@ public class ScheduleAdapter extends SectionCursorAdapter<String, ScheduleAdapte
         public SectionViewHolder(View view) {
             super(view);
             mTitle = findWidgetById(R.id.schedule_section);
-            System.out.println(mTitle);
         }
     }
 }
