@@ -48,8 +48,8 @@ public class DashboardFragment extends Fragment {
         boolean started;
 
         Calendar now = new GregorianCalendar(),
-                start = new GregorianCalendar(2016, Calendar.JANUARY, 30, 13, 0),
-                finish = new GregorianCalendar(2016, Calendar.JANUARY, 31, 10, 0);
+                start = new GregorianCalendar(2017, Calendar.FEBRUARY, 4, 12, 0),
+                finish = new GregorianCalendar(2017, Calendar.FEBRUARY, 5, 6, 0);
 
         // If the hackathon hasn't started yet we display a countdown to it
         if (now.compareTo(start) == -1) {
