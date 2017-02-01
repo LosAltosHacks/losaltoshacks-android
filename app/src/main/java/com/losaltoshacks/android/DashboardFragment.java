@@ -92,9 +92,9 @@ public class DashboardFragment extends Fragment {
             this.started = started;
 
             if (started) {
-                countdownText.setText("Hacking ends in:");
+                countdownText.setText(getString(R.string.dashboard_during_hackathon));
             } else {
-                countdownText.setText("Los Altos Hacks begins in:");
+                countdownText.setText(getString(R.string.dashboard_before_hackathon));
             }
         }
 
@@ -118,7 +118,7 @@ public class DashboardFragment extends Fragment {
                 createCountdown();
             } else {
                 countdownTime.setText(getString(R.string.timer_finished));
-                countdownText.setText("Hacking is over!");
+                countdownText.setText(getString(R.string.dashboard_after_hackathon));
             }
         }
     }

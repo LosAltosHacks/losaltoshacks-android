@@ -3,6 +3,9 @@
     <string name="action_settings">Settings</string>
 
     <string name="timer_finished">00:00</string>
+    <string name="dashboard_before_hackathon">Hacking begins in:</string>
+    <string name="dashboard_during_hackathon">Hacking ends in:</string>
+    <string name="dashboard_after_hackathon">Hacking is over!</string>
 
     <string name="sync_account_type">losaltoshacks.com</string>
 
