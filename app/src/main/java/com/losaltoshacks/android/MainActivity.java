@@ -10,8 +10,6 @@
 
 package com.losaltoshacks.android;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -20,10 +18,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.losaltoshacks.android.data.Contract;
 import com.losaltoshacks.android.data.DbHelper;
 import com.losaltoshacks.android.data.Utility;
@@ -47,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(mViewPager);
 
-        checkIfPlayServicesAvailable();
         OneSignal.startInit(this).init();
 
         checkDb();
@@ -67,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        checkIfPlayServicesAvailable();
         checkForNotification();
     }
 
@@ -76,27 +69,6 @@ public class MainActivity extends AppCompatActivity {
             Utility.openUpdates = false;
             Log.d(LOG_TAG, "Opening updates fragment because notification was opened.");
             mViewPager.setCurrentItem(2);
-        }
-    }
-
-    private void checkIfPlayServicesAvailable() {
-        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        int status = apiAvailability.isGooglePlayServicesAvailable(this);
-        if (status != ConnectionResult.SUCCESS) {
-            if (apiAvailability.isUserResolvableError(status)) {
-                Dialog errorDialog = apiAvailability.getErrorDialog(this, status, 1);
-                errorDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        MainActivity.this.finish();
-                    }
-                });
-                errorDialog.show();
-            } else {
-                Toast.makeText(this, "Your device does not have Google Play Services and is not supported.",
-                        Toast.LENGTH_LONG).show();
-                finish();
-            }
         }
     }
 
