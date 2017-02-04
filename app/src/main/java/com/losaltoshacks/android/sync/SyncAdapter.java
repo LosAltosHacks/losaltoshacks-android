@@ -35,21 +35,16 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.losaltoshacks.android.R;
 import com.losaltoshacks.android.data.Contract.ScheduleEntry;
 import com.losaltoshacks.android.data.Contract.UpdatesEntry;
+import com.losaltoshacks.android.data.FirebaseArray;
+import com.losaltoshacks.android.data.FirebaseModels.ScheduleItem;
+import com.losaltoshacks.android.data.FirebaseModels.UpdateItem;
 import com.losaltoshacks.android.data.Provider;
-import com.losaltoshacks.android.data.Utility;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Handle the transfer of data between a server and an
@@ -62,17 +57,61 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     ContentResolver mContentResolver;
 
+    private FirebaseArray mScheduleSnapshots;
+    private FirebaseArray mUpdatesSnapshots;
+
     public SyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
 
         mContentResolver = context.getContentResolver();
+        initializeArrays();
     }
 
     public SyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
         super(context, autoInitialize, allowParallelSyncs);
 
         mContentResolver = context.getContentResolver();
+        initializeArrays();
+    }
 
+    private void initializeArrays() {
+        Query mScheduleQuery = FirebaseDatabase.getInstance().getReference("/schedule");
+        mScheduleSnapshots = new FirebaseArray(mScheduleQuery);
+        mScheduleSnapshots.setOnChangedListener(new FirebaseArray.OnChangedListener() {
+            @Override
+            public void onChildChanged(EventType type, int index, int oldIndex) {
+                syncImmediately(getContext());
+            }
+
+            @Override
+            public void onDataChanged() {
+                syncImmediately(getContext());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(LOG_TAG, databaseError.toException());
+            }
+        });
+
+        Query mUpdatesQuery = FirebaseDatabase.getInstance().getReference("/updates");
+        mUpdatesSnapshots = new FirebaseArray(mUpdatesQuery);
+        mUpdatesSnapshots.setOnChangedListener(new FirebaseArray.OnChangedListener() {
+            @Override
+            public void onChildChanged(EventType type, int index, int oldIndex) {
+                syncImmediately(getContext());
+            }
+
+            @Override
+            public void onDataChanged() {
+                syncImmediately(getContext());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(LOG_TAG, databaseError.toException());
+            }
+        });
     }
 
     @Override
@@ -80,106 +119,52 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Log.d(LOG_TAG, "onPerformSync");
         Context context = getContext();
 
-        insertJSONData(downloadJSONFromURL(context.getString(R.string.sync_updates_url)),
-                downloadJSONFromURL(context.getString(R.string.sync_schedule_url)),
-                context);
+        insertFirebaseData(mScheduleSnapshots, mUpdatesSnapshots, context);
 
         Log.d(LOG_TAG, "Sync finished.");
     }
 
-    private JSONArray downloadJSONFromURL(String urlString) {
-        HttpURLConnection httpURLConnection = null;
-        URL url = null;
-
-        try {
-            url = new URL(urlString);
-            httpURLConnection = (HttpURLConnection) url.openConnection();
-            httpURLConnection.setRequestMethod("GET");
-            httpURLConnection.connect();
-
-            InputStream in = httpURLConnection.getInputStream();
-
-            return new JSONArray(Utility.readInputStream(in));
-        } catch (MalformedURLException e) {
-            Log.e(LOG_TAG, "Malformed url: " + urlString);
-            e.printStackTrace();
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "Invalid JSON data from URL: " + url.toString());
-            e.printStackTrace();
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Failed to download JSON data from URL: " + url.toString());
-            e.printStackTrace();
-        } finally {
-            if (httpURLConnection != null) {
-                httpURLConnection.disconnect();
-            }
-        }
-        return null;
-    }
-
-    private static void insertJSONData(JSONArray updatesJSON, JSONArray scheduleJSON, Context context) {
-        final String UPDATES_TITLE = "title";
-        final String UPDATES_DESCRIPTION = "description";
-        final String UPDATES_TIME = "date";
-        final String UPDATES_TAG = "tag";
-
-        final String SCHEDULE_EVENT = "event";
-        final String SCHEDULE_TIME = "time";
-        final String SCHEDULE_LOCATION = "location";
-        final String SCHEDULE_TAG = "tag";
-
+    private static void insertFirebaseData(FirebaseArray scheduleSnapshots, FirebaseArray updatesSnapshots, Context context) {
         ContentResolver contentResolver = context.getContentResolver();
 
-        try {
-            if (updatesJSON != null) {
-                ContentValues[] updatesArray = new ContentValues[updatesJSON.length()];
-                for (int i = 0; i < updatesJSON.length(); i++) {
-                    JSONObject update = updatesJSON.getJSONObject(i);
+        ContentValues[] updatesArray = new ContentValues[updatesSnapshots.getCount()];
+        for (int i = 0; i < updatesSnapshots.getCount(); i++) {
+            UpdateItem update = updatesSnapshots.getItem(i).getValue(UpdateItem.class);
 
-                    ContentValues updateValues = new ContentValues();
+            ContentValues updateValues = new ContentValues();
 
-                    updateValues.put(UpdatesEntry.COLUMN_TITLE, update.getString(UPDATES_TITLE));
-                    updateValues.put(UpdatesEntry.COLUMN_DESCRIPTION, update.getString(UPDATES_DESCRIPTION));
-                    updateValues.put(UpdatesEntry.COLUMN_TIME, update.getInt(UPDATES_TIME));
-                    updateValues.put(UpdatesEntry.COLUMN_TAG, update.getString(UPDATES_TAG));
+            updateValues.put(UpdatesEntry.COLUMN_TITLE, update.getTitle());
+            updateValues.put(UpdatesEntry.COLUMN_DESCRIPTION, update.getDescription());
+            updateValues.put(UpdatesEntry.COLUMN_TIME, update.getTime());
+            updateValues.put(UpdatesEntry.COLUMN_TAG, update.getTag());
 
-                    updatesArray[i] = updateValues;
-                }
-
-                Bundle updatesBundle = new Bundle();
-                updatesBundle.putParcelableArray(Provider.CONTENT_VALUES_ARRAY, updatesArray);
-                contentResolver.call(UpdatesEntry.CONTENT_URI,
-                        Provider.BULK_DELETE_AND_INSERT, UpdatesEntry.CONTENT_URI.toString(), updatesBundle);
-            } else {
-                Log.e(LOG_TAG, "Could not insert updates data because it was null.");
-            }
-
-            if (scheduleJSON != null) {
-                ContentValues[] scheduleArray = new ContentValues[scheduleJSON.length()];
-                for (int i = 0; i < scheduleJSON.length(); i++) {
-                    JSONObject event = scheduleJSON.getJSONObject(i);
-
-                    ContentValues scheduleValues = new ContentValues();
-
-                    scheduleValues.put(ScheduleEntry.COLUMN_EVENT, event.getString(SCHEDULE_EVENT));
-                    scheduleValues.put(ScheduleEntry.COLUMN_TIME, event.getInt(SCHEDULE_TIME));
-                    scheduleValues.put(ScheduleEntry.COLUMN_LOCATION, event.getString(SCHEDULE_LOCATION));
-                    scheduleValues.put(ScheduleEntry.COLUMN_TAG, event.getString(SCHEDULE_TAG));
-
-                    scheduleArray[i] = scheduleValues;
-                }
-
-                Bundle scheduleBundle = new Bundle();
-                scheduleBundle.putParcelableArray(Provider.CONTENT_VALUES_ARRAY, scheduleArray);
-                contentResolver.call(ScheduleEntry.CONTENT_URI,
-                        Provider.BULK_DELETE_AND_INSERT, ScheduleEntry.CONTENT_URI.toString(), scheduleBundle);
-            } else {
-                Log.e(LOG_TAG, "Could not insert schedule data because it was null.");
-            }
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "Failed to parse JSON data.");
-            e.printStackTrace();
+            updatesArray[i] = updateValues;
         }
+
+        Bundle updatesBundle = new Bundle();
+        updatesBundle.putParcelableArray(Provider.CONTENT_VALUES_ARRAY, updatesArray);
+        contentResolver.call(UpdatesEntry.CONTENT_URI,
+                Provider.BULK_DELETE_AND_INSERT, UpdatesEntry.CONTENT_URI.toString(), updatesBundle);
+
+
+        ContentValues[] scheduleArray = new ContentValues[scheduleSnapshots.getCount()];
+        for (int i = 0; i < scheduleSnapshots.getCount(); i++) {
+            ScheduleItem event = scheduleSnapshots.getItem(i).getValue(ScheduleItem.class);
+
+            ContentValues scheduleValues = new ContentValues();
+
+            scheduleValues.put(ScheduleEntry.COLUMN_EVENT, event.getEvent());
+            scheduleValues.put(ScheduleEntry.COLUMN_TIME, event.getTime());
+            scheduleValues.put(ScheduleEntry.COLUMN_LOCATION, event.getLocation());
+            scheduleValues.put(ScheduleEntry.COLUMN_TAG, event.getTag());
+
+            scheduleArray[i] = scheduleValues;
+        }
+
+        Bundle scheduleBundle = new Bundle();
+        scheduleBundle.putParcelableArray(Provider.CONTENT_VALUES_ARRAY, scheduleArray);
+        contentResolver.call(ScheduleEntry.CONTENT_URI,
+                Provider.BULK_DELETE_AND_INSERT, ScheduleEntry.CONTENT_URI.toString(), scheduleBundle);
     }
 
     public static void syncImmediately(Context context) {
@@ -206,6 +191,4 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         }
         return newAccount;
     }
-
-
 }
