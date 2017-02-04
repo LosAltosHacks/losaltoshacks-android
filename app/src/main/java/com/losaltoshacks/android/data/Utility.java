@@ -14,8 +14,6 @@ import java.util.TimeZone;
 
 public class Utility {
     private static final String LOG_TAG = Utility.class.getSimpleName();
-    public static boolean openUpdates = false;
-
     public static String formatTimestamp(long time, String format) {
         SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
         sdf.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));

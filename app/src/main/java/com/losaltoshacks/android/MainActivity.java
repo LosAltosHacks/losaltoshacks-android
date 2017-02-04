@@ -17,13 +17,10 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 
 import com.losaltoshacks.android.data.Contract;
 import com.losaltoshacks.android.data.DbHelper;
-import com.losaltoshacks.android.data.Utility;
 import com.losaltoshacks.android.sync.SyncAdapter;
-import com.onesignal.OneSignal;
 
 public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -42,11 +39,7 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(mViewPager);
 
-        OneSignal.startInit(this).init();
-
         checkDb();
-
-        checkForNotification();
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -61,15 +54,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        checkForNotification();
-    }
-
-    private void checkForNotification() {
-        if (Utility.openUpdates) {
-            Utility.openUpdates = false;
-            Log.d(LOG_TAG, "Opening updates fragment because notification was opened.");
-            mViewPager.setCurrentItem(2);
-        }
     }
 
     private void checkDb() {
